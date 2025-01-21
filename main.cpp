@@ -26,7 +26,6 @@ vector<vector<int>> leerArchivo(string nombreArchivo) {
         stringstream ss(linea);
         ss >> numNodos;
     }
-
     vector<vector<int>> matriz(numNodos, vector<int>(numNodos, 0));
 
     int lineas = 0;
@@ -38,17 +37,23 @@ vector<vector<int>> leerArchivo(string nombreArchivo) {
         }
         lineas++;
     } archivo.close();
-
+    if(lineas == 0 || lineas != numNodos) {
+        cout << "Cantidad de entradas incompatibles o no existen datos para la matriz" << endl;
+        return vacio;
+    }
     return matriz;
 }
 
+void nodosLeidos(vector<vector<int>> matriz) {
+    for(int i = 0; i < matriz.size(); i++) { 
+
+    }
+}
 int main() {
     vector<vector<int>> matriz = leerArchivo("matriz.txt");
-
-    for(int i = 0; i < matriz.size(); i++) {
-        for(int j = 0; j < matriz.size(); j++) {
-            cout << matriz[i][j] << "  ";
-        } cout << endl;
-    }
+    char c1 = 'Y';
+    int ZM = c1 + 1;
+    c1 = c1 + 1;
+    cout << "Ascii: " << ZM << endl;
     return 0;
 }
