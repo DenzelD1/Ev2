@@ -32,29 +32,50 @@ vector<vector<int>> leerArchivo(string nombreArchivo) {
     string linea;
     if(getline(archivo, linea)) {
         stringstream ss(linea);
-        ss >> numNodos;
+        if(!(ss >> numNodos) || !ss.eof()) {
+            cout << "El formato del archivo no es correcto" << endl;
+            return vacio;
+        }
+    }
+    
+    if(numNodos < 1) {
+        cout << "No es posible trabajar con esa cantidad de nodos. Minimo: 1" << endl;
+        return vacio;
+    } else if(numNodos > 26) {
+        cout << "No es posible trabajar con esa cantidad de nodos. Maximo: 26" << endl;
+        return vacio;
     }
     vector<vector<int>> matriz(numNodos, vector<int>(numNodos, 0));
 
     int lineas = 0;
     while(getline(archivo, linea)) {
+        if(lineas >= numNodos) {
+            cout << "El formato de la matriz no concuerda con la cantidad de nodos. Tiene fila(s) extra(s)" << endl;
+            return vacio;
+        }
         stringstream ss(linea);
         for(int i = 0; i < numNodos; i++) {
-            ss >> matriz[lineas][i];
+            if(!(ss >> matriz[lineas][i])) {
+                cout << "Hay un error de formato en la fila " << lineas + 1 << " de la matriz: " << linea << endl;
+                return vacio;
+            }
             ss.ignore();
             if(matriz[lineas][i] < 0) {
                 cout << "No es posible trabajar con pesos negativos" << endl;
                 return vacio;
             }
         }
+        if(ss >> linea) {
+            cout << "Hay un error de formato en la fila " << lineas + 1 << " de la matriz: " << linea << endl;
+            return vacio;
+        }
+        
         lineas++;
     } archivo.close();
     if(lineas == 0 || lineas != numNodos) {
         cout << "Cantidad de entradas incompatibles o no existen datos para la matriz" << endl;
         return vacio;
-    } else if (numNodos < 1 || numNodos > 26) {
-        cout << "Exceso o insuficiencia de nodos permitidos" << endl;
-    }
+    } 
     return matriz;
 }
 
