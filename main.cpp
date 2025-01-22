@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <climits>
 #include <fstream>
 #include <sstream>
@@ -8,8 +9,11 @@ using namespace std;
 class Arbol {
     public:
         pair<char, int> nodo;
-        vector<Arbol>* siguiente;
-        
+        vector<Arbol*> siguiente;
+        Arbol(char n, int pesoAcumulado) {
+            nodo.first = n;
+            nodo.second = pesoAcumulado;
+        }
 };
 
 //Lee el archivo y rellena la matriz
@@ -64,16 +68,73 @@ void nodosLeidos(vector<vector<int>> matriz) {
     } cout << endl;
 }
 
-void agregarArbol(int pesoDistancia, int nodoI, int nodoD, Arbol*& arbol) {
+Arbol* busquedaDeNodoInicial(Arbol* head, char nodoI) {
+    queue<Arbol*> cola;
+    cola.push(head);
+
+    while(!cola.empty()) {
+        Arbol* actual = cola.front();
+        cola.pop();
+
+        if(actual -> nodo.first == nodoI) return actual;
+        for(int i = 0; i < actual -> siguiente.size(); i++) {
+            cola.push(actual -> siguiente[i]);
+        }
+    }
+    return nullptr;
+}
+
+void agregarArbol(int pesoDistancia, int nodoI, int nodoD, Arbol*& head) {
+    nodoI = nodoI + 65;
+    nodoD = nodoD + 65;
     char inicial = nodoI;
     char destino = nodoD;
-    
+    Arbol* nuevoHijo = nullptr;
+    bool existeElNodo = false;
+    if(head -> nodo.first == inicial) {
+        if(head -> siguiente.size() == 0) {
+            nuevoHijo = new Arbol(destino, pesoDistancia);
+            head -> siguiente.push_back(nuevoHijo);
+        } else {
+            for(int i = 0; i < head -> siguiente.size(); i++) {
+                if(head -> siguiente[i] -> nodo.first == destino) {
+                    head -> siguiente[i] -> nodo.second = pesoDistancia;
+                    existeElNodo = true;
+                    break;
+                }
+            }
+            if(!existeElNodo) {
+                nuevoHijo = new Arbol(destino, pesoDistancia);
+                head -> siguiente.push_back(nuevoHijo);
+            }
+        }
+        
+    } else {
+        Arbol* nodoActual = busquedaDeNodoInicial(head, inicial);
+        if(nodoActual != nullptr) {
+            if(nodoActual -> siguiente.size() == 0) {
+                nuevoHijo = new Arbol(destino, pesoDistancia);
+                nodoActual -> siguiente.push_back(nuevoHijo);
+            } else {
+                for(int i = 0; i < nodoActual -> siguiente.size(); i++) {
+                    if(nodoActual -> siguiente[i] -> nodo.first == destino) {
+                        nodoActual -> siguiente[i] -> nodo.second = pesoDistancia;
+                        existeElNodo = true;
+                        break;
+                    }
+                }
+                if(!existeElNodo) {
+                    nuevoHijo = new Arbol(destino, pesoDistancia);
+                    nodoActual -> siguiente.push_back(nuevoHijo);
+                }
+            }
+        }
+    }
 }
 
 void dijkstra(vector<int>& distancia, vector<bool>& visitado, vector<vector<int>> matriz, 
-                int tamano, Arbol*& arbol) {
+                int tamano, Arbol*& head) {
     distancia[0] = 0;
-    agregarArbol(0, 65, arbol);
     for(int nodos = 0; nodos < tamano; nodos++) {
         int nodoActual = -1;
         
@@ -93,11 +154,19 @@ void dijkstra(vector<int>& distancia, vector<bool>& visitado, vector<vector<int>
                 int dist = distancia[nodoActual] + matriz[nodoActual][vecino];
                 if(dist < distancia[vecino]) {
                     distancia[vecino] = dist;
+                    agregarArbol(dist, nodoActual, vecino, head);
                 }
             }
         }
     }   
 
+}
+
+void imprimirArbol(Arbol* n) { 
+    for(int i = 0; i < n -> siguiente.size(); i++) {
+        cout << n -> siguiente[i] -> nodo.first << ": " << n -> siguiente[i] -> nodo.second << endl;
+    }
+    
 }
 
 int main() {
@@ -107,13 +176,17 @@ int main() {
 
     vector<vector<int>> matriz = leerArchivo(archivo);
     int tamano = matriz.size();
+    Arbol* arbol = nullptr;
     if(tamano != 0) {
-        Arbol* arbol = new Arbol();
+        arbol = new Arbol('A', 0);
         nodosLeidos(matriz);
         vector<int> distancia(tamano, INT_MAX);
         vector<bool> visitado(tamano, false);
         dijkstra(distancia, visitado, matriz, tamano, arbol);
+
+        imprimirArbol(arbol);
     }
+
     cout << "***************" << endl;
     int num = 65;
     char a = num;
