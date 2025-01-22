@@ -6,7 +6,10 @@
 using namespace std;
 
 class Arbol {
-
+    public:
+        pair<char, int> nodo;
+        vector<Arbol>* siguiente;
+        
 };
 
 //Lee el archivo y rellena la matriz
@@ -61,14 +64,16 @@ void nodosLeidos(vector<vector<int>> matriz) {
     } cout << endl;
 }
 
-void agregarArbol(int pesoDistancia, int nodo, Arbol*& arbol) {
+void agregarArbol(int pesoDistancia, int nodoI, int nodoD, Arbol*& arbol) {
+    char inicial = nodoI;
+    char destino = nodoD;
     
 }
 
 void dijkstra(vector<int>& distancia, vector<bool>& visitado, vector<vector<int>> matriz, 
                 int tamano, Arbol*& arbol) {
     distancia[0] = 0;
-    agregarArbol(0, 0, arbol);
+    agregarArbol(0, 65, arbol);
     for(int nodos = 0; nodos < tamano; nodos++) {
         int nodoActual = -1;
         
@@ -103,12 +108,15 @@ int main() {
     vector<vector<int>> matriz = leerArchivo(archivo);
     int tamano = matriz.size();
     if(tamano != 0) {
-        Arbol* arbol;
+        Arbol* arbol = new Arbol();
         nodosLeidos(matriz);
         vector<int> distancia(tamano, INT_MAX);
         vector<bool> visitado(tamano, false);
         dijkstra(distancia, visitado, matriz, tamano, arbol);
     }
-
+    cout << "***************" << endl;
+    int num = 65;
+    char a = num;
+    cout << a << endl;
     return 0;
 }
