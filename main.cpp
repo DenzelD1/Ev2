@@ -191,9 +191,14 @@ void imprimirArbol(Arbol* n) {
 }
 
 int main() {
-    string archivo;
     cout << "Escribir la ruta del archivo txt:" << endl;
-    getline(cin, archivo);
+    string archivo;
+    do {
+        getline(cin, archivo);
+        if(archivo.length() == 0) {
+            cout << "Debe indicar una ruta" << endl;
+        }
+    } while(archivo.length() == 0);
 
     vector<vector<int>> matriz = leerArchivo(archivo);
     int tamano = matriz.size();
@@ -205,12 +210,26 @@ int main() {
         vector<bool> visitado(tamano, false);
         dijkstra(distancia, visitado, matriz, tamano, arbol);
 
+        string caracter;
+        int ascii;
+        cout << "Ingrese el nodo destino:" << endl;
+        do {
+            getline(cin, caracter);
+            if(caracter.length() == 0) {
+                cout << "Ingrese un caracter" << endl;
+            } else if(caracter.length() > 1) {
+                cout << "Solo se permite un caracter" << endl;
+            } else {
+                ascii = caracter[0];
+                if(ascii < 65 || ascii > (tamano + 64)) {
+                    cout << "Debe ingresar uno de los nodos leidos exactamente como se muestra" << endl;
+                }
+            }
+        } while(ascii < 65 || ascii > (tamano + 64));
+        string algo = "hola";
+        int algo2 = algo[0];
+        cout << algo2 << endl;
         imprimirArbol(arbol);
     }
-
-    cout << "***************" << endl;
-    int num = 65;
-    char a = num;
-    cout << a << endl;
     return 0;
 }
