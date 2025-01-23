@@ -7,6 +7,7 @@
 #include <sstream>
 using namespace std;
 
+//Clase del arbol que guardara la ruta mas corta para cada nodo
 class Arbol {
     public:
         pair<char, int> nodo;
@@ -57,7 +58,7 @@ vector<vector<int>> leerArchivo(string nombreArchivo) {
         stringstream ss(linea);
         for(int i = 0; i < numNodos; i++) {
             if(!(ss >> matriz[lineas][i])) {
-                cout << "Hay un error de formato en la fila " << lineas + 1 << " de la matriz: " << linea << endl;
+                cout << "Hay un error de formato en la matriz. Tal vez contenga datos no enteros o espacios en blanco: " << linea << endl;
                 return vacio;
             }
             ss.ignore();
@@ -66,8 +67,8 @@ vector<vector<int>> leerArchivo(string nombreArchivo) {
                 return vacio;
             }
         }
-        if(ss >> linea) {
-            cout << "Hay un error de formato en la fila " << lineas + 1 << " de la matriz: " << linea << endl;
+        if(!ss.eof()) {
+            cout << "Hay un error de formato en la matriz ubicado al final de una fila (tal vez tenga espacios en blanco adicionales): " << linea << endl;
             return vacio;
         }
         
@@ -90,6 +91,8 @@ void nodosLeidos(vector<vector<int>> matriz) {
     } cout << endl;
 }
 
+//Realiza una busqueda nivel por nivel hasta encontrar el nodo inicial con su respectiva 
+//ruta en base a la arista y la distancia calculada por dijkstra
 Arbol* busquedaDeNodoInicial(Arbol* head, char nodoI, int pesoArista, int pesoDistancia) {
     queue<Arbol*> cola;
     cola.push(head);
@@ -106,14 +109,13 @@ Arbol* busquedaDeNodoInicial(Arbol* head, char nodoI, int pesoArista, int pesoDi
     return nullptr;
 }
 
+//La funcion agrega al arbol el hijo del nodo inicial correspondiente
 void agregarArbol(int pesoDistancia, int nodoI, int nodoD, int pesoArista, Arbol*& head) {
     nodoI = nodoI + 65;
     nodoD = nodoD + 65;
     char inicial = nodoI;
     char destino = nodoD;
-    Arbol* nuevoHijo = nullptr;
-    bool existeElNodo = false;
-    
+    Arbol* nuevoHijo = nullptr;    
     Arbol* nodoActual = busquedaDeNodoInicial(head, inicial, pesoArista, pesoDistancia);
     if(nodoActual != nullptr) {
         nuevoHijo = new Arbol(destino, pesoDistancia);
@@ -121,6 +123,8 @@ void agregarArbol(int pesoDistancia, int nodoI, int nodoD, int pesoArista, Arbol
     } 
 }
 
+//El algoritmo calcula la distancia mas corta de todos los nodos a partir del nodo A, 
+//cuyo calculo de distancia se envia al metodo agregarArbol para su construccion
 void dijkstra(vector<int>& distancia, vector<bool>& visitado, vector<vector<int>> matriz, 
                 int tamano, Arbol*& head) {
     distancia[0] = 0;
@@ -150,6 +154,7 @@ void dijkstra(vector<int>& distancia, vector<bool>& visitado, vector<vector<int>
 
 }
 
+//Realiza una busqueda en profundidad, la cual, imprime la informacion del nodo destino
 void imprimirRutaDestino(Arbol* head, char nodoD, int menor) {
     vector<char> ruta;
     stack<Arbol*> pila;
@@ -197,6 +202,8 @@ void imprimirRutaDestino(Arbol* head, char nodoD, int menor) {
     } cout << endl;
 }
 
+//Realiza una busqueda en profundidad, la cual, calcula el menor a partir del nodo destino
+//presente en cada nodo inicial
 int encontrarElMenor(Arbol* head, char nodoD) {
     queue<Arbol*> cola;
     cola.push(head);
@@ -216,9 +223,11 @@ int encontrarElMenor(Arbol* head, char nodoD) {
     if(menor == INT_MAX) return -1;
     return menor;
 }
-
+//----------------------------------------------------------------------------------------------
+//                                          MAIN
+//----------------------------------------------------------------------------------------------
 int main() {
-    cout << "===================================================" << endl;
+    cout << "====================================================================" << endl;
     cout << "Escribir la ruta del archivo txt:" << endl;
     string archivo;
     do {
@@ -227,15 +236,14 @@ int main() {
             cout << "Debe indicar una ruta" << endl;
         }
     } while(archivo.length() == 0);
-    cout << "===================================================" << endl;
-
+    cout << "====================================================================" << endl;
     vector<vector<int>> matriz = leerArchivo(archivo);
     int tamano = matriz.size();
     Arbol* arbol = nullptr;
     if(tamano != 0) {
         arbol = new Arbol('A', 0);
         nodosLeidos(matriz);
-        cout << "---------------------------------------------------" << endl;
+        cout << "--------------------------------------------------------------------" << endl;
         vector<int> distancia(tamano, INT_MAX);
         vector<bool> visitado(tamano, false);
         dijkstra(distancia, visitado, matriz, tamano, arbol);
@@ -266,11 +274,11 @@ int main() {
                     } else {
                         imprimirRutaDestino(arbol, letra, menor);
                     }
-                    cout << "*****************************************************" << endl;
+                    cout << "********************************************************************" << endl;
                     cout << "Ingrese el nodo destino (o ingrese 'salir'):" << endl;
                 }
             }
-            cout << "*****************************************************" << endl;
+            cout << "********************************************************************" << endl;
         } 
     }
     return 0;
