@@ -113,45 +113,27 @@ void agregarArbol(int pesoDistancia, int nodoI, int nodoD, Arbol*& head) {
     char destino = nodoD;
     Arbol* nuevoHijo = nullptr;
     bool existeElNodo = false;
-    if(head -> nodo.first == inicial) {
-        if(head -> siguiente.size() == 0) {
+    
+    Arbol* nodoActual = busquedaDeNodoInicial(head, inicial);
+    if(nodoActual != nullptr) {
+        if(nodoActual -> siguiente.size() == 0) {
             nuevoHijo = new Arbol(destino, pesoDistancia);
-            head -> siguiente.push_back(nuevoHijo);
+            nodoActual -> siguiente.push_back(nuevoHijo);
         } else {
-            for(int i = 0; i < head -> siguiente.size(); i++) {
-                if(head -> siguiente[i] -> nodo.first == destino) {
-                    head -> siguiente[i] -> nodo.second = pesoDistancia;
+            for(int i = 0; i < nodoActual -> siguiente.size(); i++) {
+                if(nodoActual -> siguiente[i] -> nodo.first == destino) {
+                    nodoActual -> siguiente[i] -> nodo.second = pesoDistancia;
                     existeElNodo = true;
                     break;
                 }
             }
             if(!existeElNodo) {
                 nuevoHijo = new Arbol(destino, pesoDistancia);
-                head -> siguiente.push_back(nuevoHijo);
-            }
-        }
-        
-    } else {
-        Arbol* nodoActual = busquedaDeNodoInicial(head, inicial);
-        if(nodoActual != nullptr) {
-            if(nodoActual -> siguiente.size() == 0) {
-                nuevoHijo = new Arbol(destino, pesoDistancia);
                 nodoActual -> siguiente.push_back(nuevoHijo);
-            } else {
-                for(int i = 0; i < nodoActual -> siguiente.size(); i++) {
-                    if(nodoActual -> siguiente[i] -> nodo.first == destino) {
-                        nodoActual -> siguiente[i] -> nodo.second = pesoDistancia;
-                        existeElNodo = true;
-                        break;
-                    }
-                }
-                if(!existeElNodo) {
-                    nuevoHijo = new Arbol(destino, pesoDistancia);
-                    nodoActual -> siguiente.push_back(nuevoHijo);
-                }
             }
         }
     }
+    
 }
 
 void dijkstra(vector<int>& distancia, vector<bool>& visitado, vector<vector<int>> matriz, 
@@ -272,7 +254,6 @@ int main() {
         vector<int> distancia(tamano, INT_MAX);
         vector<bool> visitado(tamano, false);
         dijkstra(distancia, visitado, matriz, tamano, arbol);
-        imprimirArbol(arbol);
 
         string caracter;
         int ascii;
