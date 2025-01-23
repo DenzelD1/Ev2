@@ -90,15 +90,15 @@ void nodosLeidos(vector<vector<int>> matriz) {
     } cout << endl;
 }
 
-Arbol* busquedaDeNodoInicial(Arbol* head, char nodoI) {
+Arbol* busquedaDeNodoInicial(Arbol* head, char nodoI, int pesoArista, int pesoDistancia) {
     queue<Arbol*> cola;
     cola.push(head);
-
+    int pesoActual = 0;
     while(!cola.empty()) {
         Arbol* actual = cola.front();
         cola.pop();
-
-        if(actual -> nodo.first == nodoI) return actual;
+        pesoActual = actual -> nodo.second;
+        if(actual -> nodo.first == nodoI && (pesoActual + pesoArista) == pesoDistancia) return actual;
         for(int i = 0; i < actual -> siguiente.size(); i++) {
             cola.push(actual -> siguiente[i]);
         }
@@ -106,7 +106,7 @@ Arbol* busquedaDeNodoInicial(Arbol* head, char nodoI) {
     return nullptr;
 }
 
-void agregarArbol(int pesoDistancia, int nodoI, int nodoD, Arbol*& head) {
+void agregarArbol(int pesoDistancia, int nodoI, int nodoD, int pesoArista, Arbol*& head) {
     nodoI = nodoI + 65;
     nodoD = nodoD + 65;
     char inicial = nodoI;
@@ -114,26 +114,11 @@ void agregarArbol(int pesoDistancia, int nodoI, int nodoD, Arbol*& head) {
     Arbol* nuevoHijo = nullptr;
     bool existeElNodo = false;
     
-    Arbol* nodoActual = busquedaDeNodoInicial(head, inicial);
+    Arbol* nodoActual = busquedaDeNodoInicial(head, inicial, pesoArista, pesoDistancia);
     if(nodoActual != nullptr) {
-        if(nodoActual -> siguiente.size() == 0) {
-            nuevoHijo = new Arbol(destino, pesoDistancia);
-            nodoActual -> siguiente.push_back(nuevoHijo);
-        } else {
-            for(int i = 0; i < nodoActual -> siguiente.size(); i++) {
-                if(nodoActual -> siguiente[i] -> nodo.first == destino) {
-                    nodoActual -> siguiente[i] -> nodo.second = pesoDistancia;
-                    existeElNodo = true;
-                    break;
-                }
-            }
-            if(!existeElNodo) {
-                nuevoHijo = new Arbol(destino, pesoDistancia);
-                nodoActual -> siguiente.push_back(nuevoHijo);
-            }
-        }
-    }
-    
+        nuevoHijo = new Arbol(destino, pesoDistancia);
+        nodoActual -> siguiente.push_back(nuevoHijo); 
+    } 
 }
 
 void dijkstra(vector<int>& distancia, vector<bool>& visitado, vector<vector<int>> matriz, 
@@ -157,7 +142,7 @@ void dijkstra(vector<int>& distancia, vector<bool>& visitado, vector<vector<int>
                 int dist = distancia[nodoActual] + matriz[nodoActual][vecino];
                 if(dist < distancia[vecino]) {
                     distancia[vecino] = dist;
-                    agregarArbol(dist, nodoActual, vecino, head);
+                    agregarArbol(dist, nodoActual, vecino, matriz[nodoActual][vecino], head);
                 }
             }
         }
@@ -254,7 +239,6 @@ int main() {
         vector<int> distancia(tamano, INT_MAX);
         vector<bool> visitado(tamano, false);
         dijkstra(distancia, visitado, matriz, tamano, arbol);
-
         string caracter;
         int ascii;
         cout << "Ingrese el nodo destino (o ingrese 'salir'):" << endl;
