@@ -251,6 +251,7 @@ int encontrarElMenor(Arbol* head, char nodoD) {
 }
 
 int main() {
+    cout << "===================================================" << endl;
     cout << "Escribir la ruta del archivo txt:" << endl;
     string archivo;
     do {
@@ -259,6 +260,7 @@ int main() {
             cout << "Debe indicar una ruta" << endl;
         }
     } while(archivo.length() == 0);
+    cout << "===================================================" << endl;
 
     vector<vector<int>> matriz = leerArchivo(archivo);
     int tamano = matriz.size();
@@ -266,14 +268,23 @@ int main() {
     if(tamano != 0) {
         arbol = new Arbol('A', 0);
         nodosLeidos(matriz);
+        cout << "---------------------------------------------------" << endl;
         vector<int> distancia(tamano, INT_MAX);
         vector<bool> visitado(tamano, false);
         dijkstra(distancia, visitado, matriz, tamano, arbol);
+        imprimirArbol(arbol);
+
         string caracter;
         int ascii;
-        cout << "Ingrese el nodo destino:" << endl;
-        do {
+        cout << "Ingrese el nodo destino (o ingrese 'salir'):" << endl;
+        while(true) {
             getline(cin, caracter);
+
+            if(caracter == "salir"){
+                cout << "Saliendo del programa..." << endl;
+                break;
+            } 
+            
             if(caracter.length() == 0) {
                 cout << "Ingrese un caracter" << endl;
             } else if(caracter.length() > 1) {
@@ -282,16 +293,20 @@ int main() {
                 ascii = caracter[0];
                 if(ascii < 65 || ascii > (tamano + 64)) {
                     cout << "Debe ingresar uno de los nodos leidos exactamente como se muestra" << endl;
+                } else {
+                    char letra = ascii;
+                    int menor = encontrarElMenor(arbol, letra);
+                    if(menor == -1) {
+                        cout << "El nodo al que se quiere llegar no es posible. Pruebe con otro." << endl;
+                    } else {
+                        imprimirRutaDestino(arbol, letra, menor);
+                    }
+                    cout << "*****************************************************" << endl;
+                    cout << "Ingrese el nodo destino (o ingrese 'salir'):" << endl;
                 }
             }
-        } while(ascii < 65 || ascii > (tamano + 64));
-        char letra = ascii;
-        int menor = encontrarElMenor(arbol, letra);
-        if(menor == -1) {
-            cout << "El nodo al que se quiere llegar no es posible" << endl;
-        } else {
-            imprimirRutaDestino(arbol, letra, menor);
-        }
+            cout << "*****************************************************" << endl;
+        } 
     }
     return 0;
 }
