@@ -52,7 +52,7 @@ vector<vector<int>> leerArchivo(string nombreArchivo) {
     int lineas = 0;
     while(getline(archivo, linea)) {
         if(lineas >= numNodos) {
-            cout << "El formato de la matriz no concuerda con la cantidad de nodos. Tiene fila(s) extra(s)" << endl;
+            cout << "El formato de la matriz no concuerda con la cantidad de nodos. Tiene fila(s) extra(s) o lineas en blanco" << endl;
             return vacio;
         }
         stringstream ss(linea);
@@ -202,7 +202,7 @@ void imprimirRutaDestino(Arbol* head, char nodoD, int menor) {
     } cout << endl;
 }
 
-//Realiza una busqueda en profundidad, la cual, calcula el menor a partir del nodo destino
+//Realiza una busqueda nivel por nivel, la cual, calcula el menor a partir del nodo destino
 //presente en cada nodo inicial
 int encontrarElMenor(Arbol* head, char nodoD) {
     queue<Arbol*> cola;
