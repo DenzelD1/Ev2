@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <stack>
 #include <climits>
 #include <fstream>
 #include <sstream>
@@ -166,7 +167,6 @@ void dijkstra(vector<int>& distancia, vector<bool>& visitado, vector<vector<int>
         }
 
         if(distancia[nodoActual] == INT_MAX) {
-            cout << "El nodo " << nodoActual << "no se puede acceder" << endl;
             break;
         }
         visitado[nodoActual] = true;
@@ -183,11 +183,71 @@ void dijkstra(vector<int>& distancia, vector<bool>& visitado, vector<vector<int>
 
 }
 
-void imprimirArbol(Arbol* n) { 
-    for(int i = 0; i < n -> siguiente.size(); i++) {
-        cout << n -> siguiente[i] -> nodo.first << ": " << n -> siguiente[i] -> nodo.second << endl;
+void imprimirRutaDestino(Arbol* head, char nodoD, int menor) {
+    vector<char> ruta;
+    stack<Arbol*> pila;
+    stack<int> indices;
+
+    pila.push(head);
+    indices.push(0);
+
+    while(!pila.empty()) {
+        Arbol* actual = pila.top();
+        int indice = indices.top();
+
+        if(actual -> nodo.first == nodoD && actual -> nodo.second == menor) {
+            ruta.push_back(actual -> nodo.first);
+            break;
+        }
+
+        if(indice < actual -> siguiente.size()) {
+            int auxIndice = indices.top();
+            indices.pop();
+            auxIndice++;
+
+            indices.push(auxIndice);
+            pila.push(actual -> siguiente[indice]);
+            indices.push(0);
+            ruta.push_back(actual -> nodo.first);
+        } else {
+            pila.pop();
+            indices.pop();
+
+            if(ruta.size() > 0) {
+                ruta.pop_back();
+            }
+        }
     }
-    
+
+    cout << "Distancia: " << menor << endl;
+    cout << "Ruta: ";
+    for(int j = 0; j < ruta.size(); j++) {
+        if((ruta.size() - 1) == j) {
+            cout << ruta[j];
+        } else {
+            cout << ruta[j] << " -> ";
+        }
+    } cout << endl;
+}
+
+int encontrarElMenor(Arbol* head, char nodoD) {
+    queue<Arbol*> cola;
+    cola.push(head);
+    int menor = INT_MAX;
+    while(!cola.empty()) {
+        Arbol* actual = cola.front();
+        cola.pop();
+        if(actual -> nodo.first == nodoD) {
+            if(actual -> nodo.second < menor) {
+                menor = actual -> nodo.second;
+            }
+        }
+        for(int i = 0; i < actual -> siguiente.size(); i++) {
+            cola.push(actual -> siguiente[i]);
+        }
+    }
+    if(menor == INT_MAX) return -1;
+    return menor;
 }
 
 int main() {
@@ -209,7 +269,6 @@ int main() {
         vector<int> distancia(tamano, INT_MAX);
         vector<bool> visitado(tamano, false);
         dijkstra(distancia, visitado, matriz, tamano, arbol);
-
         string caracter;
         int ascii;
         cout << "Ingrese el nodo destino:" << endl;
@@ -226,10 +285,13 @@ int main() {
                 }
             }
         } while(ascii < 65 || ascii > (tamano + 64));
-        string algo = "hola";
-        int algo2 = algo[0];
-        cout << algo2 << endl;
-        imprimirArbol(arbol);
+        char letra = ascii;
+        int menor = encontrarElMenor(arbol, letra);
+        if(menor == -1) {
+            cout << "El nodo al que se quiere llegar no es posible" << endl;
+        } else {
+            imprimirRutaDestino(arbol, letra, menor);
+        }
     }
     return 0;
 }
